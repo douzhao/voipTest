@@ -30,34 +30,11 @@ const uint8_t pongString[] = "pong\n";
   [UIUserNotificationSettings settingsForTypes:types categories:nil];
   
   [[UIApplication sharedApplication] registerUserNotificationSettings:mySettings];
-  
-  if(self.inputStream)
-  {
-    [self.inputStream close];
-    [self.outputStream close];
-    self.inputStream = nil;
-    self.outputStream = nil;
-  }
-  if (!self.inputStream)
-  {
-    CFReadStreamRef readStream;
-    CFWriteStreamRef writeStream;
-    CFStreamCreatePairWithSocketToHost(NULL, (__bridge CFStringRef)(@"192.168.11.108"), 50007, &readStream, &writeStream);
-    
-    self.inputStream = (__bridge_transfer NSInputStream *)readStream;
-    self.outputStream = (__bridge_transfer NSOutputStream *)writeStream;
-    [self.inputStream setProperty:NSStreamNetworkServiceTypeVoIP forKey:NSStreamNetworkServiceType];
-    [self.outputStream setProperty:NSStreamNetworkServiceTypeVoIP forKey:NSStreamNetworkServiceType] ;
-    [self.inputStream setDelegate:self];
-    [self.outputStream setDelegate:self];
-    [self.inputStream scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
-    [self.outputStream scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
-    [self.inputStream open];
-    [self.outputStream open];
-  }
+  [self launchConnection];
   
     return YES;
 }
+
 
 - (void)applicationWillResignActive:(UIApplication *)application {
   NSLog(@"voip test WillResignActive");
@@ -116,22 +93,78 @@ const uint8_t pongString[] = "pong\n";
 
 #pragma mark - NSStreamDelegate
 
+- (NSInputStream *)inputStream
+{
+  if (!_inputStream) {
+    [self createSocets];
+  }
+  return _inputStream;
+}
+
+- (NSOutputStream *)outputStream
+{
+  if (!_outputStream) {
+    [self createSocets];
+  }
+  return _outputStream;
+}
+
+- (void)createSocets
+{
+  CFReadStreamRef readStream;
+  CFWriteStreamRef writeStream;
+  CFStreamCreatePairWithSocketToHost(NULL, (__bridge CFStringRef)(@"192.168.11.108"), 50007, &readStream, &writeStream);
+  
+  _inputStream = (__bridge_transfer NSInputStream *)readStream;
+  _outputStream = (__bridge_transfer NSOutputStream *)writeStream;
+  [_inputStream setProperty:NSStreamNetworkServiceTypeVoIP forKey:NSStreamNetworkServiceType];
+  [_outputStream setProperty:NSStreamNetworkServiceTypeVoIP forKey:NSStreamNetworkServiceType] ;
+  [_inputStream setDelegate:self];
+  [_outputStream setDelegate:self];
+  [_inputStream scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
+  [_outputStream scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
+}
+
+- (void)closeConnection
+{
+  [self.inputStream close];
+  [self.outputStream close];
+  self.inputStream = nil;
+  self.outputStream = nil;
+}
+
+- (void)launchConnection
+{
+  [self.inputStream open];
+  [self.outputStream open];
+}
+
+- (void)relaunchConnection
+{
+  [self closeConnection];
+  [self launchConnection];
+}
+
 - (void)stream:(NSStream *)aStream handleEvent:(NSStreamEvent)eventCode
 {
   switch (eventCode) {
-    case NSStreamEventNone:
-      // do nothing.
+    case NSStreamEventNone: {
       break;
+    }
       
-    case NSStreamEventEndEncountered:
+    case NSStreamEventEndEncountered: {
       [self addEvent:@"Connection Closed"];
+      [self closeConnection];
       break;
+    }
       
-    case NSStreamEventErrorOccurred:
+    case NSStreamEventErrorOccurred: {
       [self addEvent:[NSString stringWithFormat:@"Had error: %@", aStream.streamError]];
+      [self performSelector:@selector(relaunchConnection) withObject:nil afterDelay:20];
       break;
+    }
       
-    case NSStreamEventHasBytesAvailable:
+    case NSStreamEventHasBytesAvailable: {
       if (aStream == self.inputStream)
       {
         uint8_t buffer[1024];
@@ -154,8 +187,9 @@ const uint8_t pongString[] = "pong\n";
         }
       }
       break;
+    }
       
-    case NSStreamEventHasSpaceAvailable:
+    case NSStreamEventHasSpaceAvailable: {
       if (aStream == self.outputStream && !self.sentPing)
       {
         self.sentPing = YES;
@@ -166,13 +200,15 @@ const uint8_t pongString[] = "pong\n";
         }
       }
       break;
+    }
       
-    case NSStreamEventOpenCompleted:
+    case NSStreamEventOpenCompleted: {
       if (aStream == self.inputStream)
       {
         [self addEvent:@"Connection Opened"];
       }
       break;
+    }
       
     default:
       break;

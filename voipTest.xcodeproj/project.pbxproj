@@ -168,6 +168,11 @@
 				TargetAttributes = {
 					2CF4BA051ABC1A6D00612A25 = {
 						CreatedOnToolsVersion = 6.2;
+						SystemCapabilities = {
+							com.apple.BackgroundModes = {
+								enabled = 1;
+							};
+						};
 					};
 					2CF4BA1E1ABC1A6D00612A25 = {
 						CreatedOnToolsVersion = 6.2;
@@ -414,6 +419,7 @@
 				2CF4BA2B1ABC1A6D00612A25 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		2CF4BA2C1ABC1A6D00612A25 /* Build configuration list for PBXNativeTarget "voipTestTests" */ = {
 			isa = XCConfigurationList;
@@ -422,6 +428,7 @@
 				2CF4BA2E1ABC1A6D00612A25 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

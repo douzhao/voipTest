@@ -11,13 +11,14 @@ def handle_connection(client, address):
         try:
             client.send("ping..")
             sleep(30)
+            print "pong.."
         except socket.error:
             print "Client: {} with ip: {} DISCONNECTED".format(client, address)
             return
 
 
 host = ''
-port = 50007
+port = 50008
 backlog = 5
 size = 64
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

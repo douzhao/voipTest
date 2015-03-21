@@ -43,6 +43,13 @@ const uint8_t pongString[] = "pong\n";
 
 - (IBAction)didTapConnect:(id)sender
 {
+    if(self.inputStream)
+    {
+        [self.inputStream close];
+        [self.outputStream close];
+        self.inputStream = nil;
+        self.outputStream = nil;
+    }
     if (!self.inputStream)
     {
         CFReadStreamRef readStream;
@@ -106,6 +113,7 @@ const uint8_t pongString[] = "pong\n";
                     [self addEvent:@"Notification sent"];
                     [[UIApplication sharedApplication] presentLocalNotificationNow:notification];
                 }
+                
                 else if ([stringRead isEqualToString:@"ping"])
                 {
                     [self.outputStream write:pongString maxLength:strlen((char*)pongString)];

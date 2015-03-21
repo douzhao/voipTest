@@ -9,9 +9,7 @@
 #import "ViewController.h"
 #import "AppDelegate.h"
 
-@interface ViewController () <NSStreamDelegate>
-
-@property (nonatomic, strong) NSMutableString *communicationLog;
+@interface ViewController ()
 
 @end
 
@@ -24,10 +22,5 @@
 }
 
 
-
-- (IBAction)didTapConnect:(id)sender
-{
-  
-}
 
 @end

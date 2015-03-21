@@ -10,9 +10,6 @@
 
 @interface ViewController : UIViewController
 
-@property (strong, nonatomic) IBOutlet UITextField *txtIP;
-@property (strong, nonatomic) IBOutlet UITextField *txtPort;
-@property (strong, nonatomic) IBOutlet UITextView *txtReceivedData;
 
 @end
 

@@ -88,13 +88,19 @@ const uint8_t pongString[] = "pong\n";
 
 - (void)applicationWillTerminate:(UIApplication *)application {
   NSLog(@"voip test WillTerminate");
+  UILocalNotification *notification = [[UILocalNotification alloc] init];
+  notification.alertBody = @"User close app";
+  notification.alertAction = @"Answer";
+  notification.applicationIconBadgeNumber = 1;
+  [self addEvent:@"Notification sent"];
+  [[UIApplication sharedApplication] presentLocalNotificationNow:notification];
     // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
 }
 
 - (void)application:(UIApplication *)app didReceiveLocalNotification:(UILocalNotification *)notif
 {
     [[UIApplication sharedApplication] cancelAllLocalNotifications];
-    app.applicationIconBadgeNumber = notif.applicationIconBadgeNumber - 1;
+    app.applicationIconBadgeNumber = notif.applicationIconBadgeNumber;
     
     notif.soundName = UILocalNotificationDefaultSoundName;
     

@@ -11,6 +11,8 @@
 @interface AppDelegate : UIResponder <UIApplicationDelegate>
 
 @property (strong, nonatomic) UIWindow *window;
+@property (nonatomic, strong) NSInputStream *inputStream;
+@property (nonatomic, strong) NSOutputStream *outputStream;
 
 
 @end
